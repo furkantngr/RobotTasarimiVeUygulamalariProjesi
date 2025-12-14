@@ -1,117 +1,49 @@
-🚗 Otonom Sürüş İçin VLM Tabanlı Karar Destek Mekanizması
+# 🚗 Otonom Sürüş İçin Görme-Dil Modeli (VLM) Tabanlı Karar Mekanizması
 
-(VLM-Based Decision Making Mechanism for Autonomous Driving)
+![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
+![Ollama](https://img.shields.io/badge/Backend-Ollama-orange)
+![Model](https://img.shields.io/badge/Model-LLaVA%20%2F%20BakLLaVA-green)
+![Status](https://img.shields.io/badge/Status-Prototype-yellow)
 
-"Algılayan araçlardan, düşünen ve anlayan araçlara..."
+## 📋 Proje Özeti
+Bu proje, otonom araç teknolojilerinde **Yüksek Seviyeli Karar Verme (High-Level Decision Making)** katmanını simüle etmek amacıyla geliştirilmiş hibrit bir yapay zeka sistemidir.
 
-📋 Proje Özeti ve Kapsam
+Geleneksel "Modüler" sistemlerin esneklik sorunları ve "Uçtan Uca" (End-to-End) sistemlerin açıklanabilirlik (black-box) problemlerine çözüm olarak; **Görme-Dil Modellerinin (Vision-Language Models - VLM)** sağduyu ve muhakeme yeteneklerini kullanır. Proje, Daniel Kahneman'ın *"Hızlı ve Yavaş Düşünme"* teorisini otonom sürüşe uyarlayarak, VLM'i **"Sistem 2" (Bilişsel/Mantıksal)** karar verici olarak konumlandırır.
 
-Bu proje, geleneksel otonom sürüş algoritmalarının (kural tabanlı veya uçtan uca kara kutu modelleri) yetersiz kaldığı karmaşık trafik senaryolarında, Büyük Dil Modelleri (LLM) ve Görme-Dil Modellerini (VLM) bir "Yüksek Seviyeli Karar Verici" (High-Level Decision Maker) olarak konumlandıran hibrit bir mimari sunmaktadır.
+## 🚀 Temel Özellikler
 
-Projenin temel amacı, aracın sadece çevresel nesneleri algılamasını değil, olaylar arasında nedensel ilişkiler kurmasını (örneğin: "Top yola yuvarlandı -> Çocuk çıkabilir -> Yavaşla") sağlamaktır.
+* [cite_start]**Zincirleme Düşünce (Chain-of-Thought - CoT):** Model, sadece bir komut üretmez; karara varmadan önce *Algı -> Muhakeme -> Tahmin -> Planlama* adımlarını izler[cite: 106].
+* **Açıklanabilir Yapay Zeka (XAI):** Her kararın nedenini ve mantıksal dayanağını (Rationale) raporlar. [cite_start]Kaza sonrası analizler için kritik önem taşır[cite: 202].
+* **VLM Entegrasyonu:** Görsel veriyi analiz etmek için LLaVA (Large Language-and-Vision Assistant) modelini kullanır.
+* **Otomatik Loglama:** Üretilen tüm kararlar ve analizler zaman damgasıyla `logs/` klasörüne kaydedilir.
 
-🏗 Mimari Yaklaşım: Sistem 1 ve Sistem 2
+## 🛠️ Mimari Yaklaşım
 
-Bu projede, Nobel ödüllü Daniel Kahneman'ın "Hızlı ve Yavaş Düşünme" teorisi otonom sürüşe uyarlanmıştır:
+Proje, literatürdeki **DriveAgent-R1** ve **CoT4AD** mimarilerinden esinlenerek tasarlanmıştır.
 
-🧠 Sistem 2 (VLM Ajanı - Yavaş Düşünme): Karmaşık ve belirsiz durumlarda devreye giren, stratejik kararlar alan ve muhakeme yeteneği olan katman. (Örn: "Agresif sürücüden kaçınmak için şerit değiştir.").
+1.  **Girdi:** Araç kamerasından alınan anlık trafik görüntüsü.
+2.  **VLM Motoru (Beyin):** Görüntüyü işler ve anlamsal bağlamı (semantic context) çıkarır.
+3.  **Prompt Mühendisliği:** Modelin halüsinasyon görmesini engellemek için yapılandırılmış CoT istemleri kullanılır.
+4.  **Çıktı:** JSON formatında yapılandırılmış sürüş kararı (Örn: "Hızlan", "Yavaşla", "Dur").
 
-🛡️ Sistem 1 (Güvenlik Katmanı - Hızlı Düşünme): Deterministik, milisaniye hassasiyetinde çalışan ve VLM'in olası halüsinasyonlarını filtreleyen güvenlik bariyeri (Safety Guard/LLM-Hinted RL).
+---
 
-✨ Temel Özellikler
+## 📦 Kurulum
 
-Zincirleme Düşünce (Chain-of-Thought - CoT): Model, "Fren yap" demeden önce neden fren yapması gerektiğini adım adım açıklar (Şeffaflık).
+Projeyi yerel makinenizde çalıştırmak için aşağıdaki adımları izleyin.
 
-Halüsinasyon Filtresi: LLM'in ürettiği aksiyonlar, fiziksel kurallar ve sensör verileriyle (mesafe, hız) çapraz kontrolden geçirilir.
+### 1. Gereksinimler
+* Python 3.8 veya üzeri
+* [Ollama](https://ollama.com/) (Yerel LLM sunucusu)
 
-Senaryo Bazlı Simülasyon: Okul bölgesi, agresif sürücü ve otoyol senaryoları üzerinde karar mekanizması testi.
-
-📂 Proje Yapısı
-
-.
-├── main.py                 # Simülasyonu başlatan ana dosya
-├── config.py               # Model konfigürasyonları
-├── requirements.txt        # Gerekli kütüphaneler
-├── modules/
-│   ├── perception.py       # (Mock) Sensör ve sahne verisi üretici
-│   ├── vlm_agent.py        # Karar veren LLM/VLM Ajanı (Reasoning)
-│   └── safety_guard.py     # Kararları denetleyen Güvenlik Katmanı
-└── assets/
-    └── architecture.png    # Mimari diyagram
-
-
-🚀 Kurulum ve Çalıştırma
-
-Repoyu klonlayın:
-
-git clone [https://github.com/kullaniciadi/llm-autonomous-driving.git](https://github.com/kullaniciadi/llm-autonomous-driving.git)
-cd llm-autonomous-driving
-
-
-Gereksinimleri yükleyin:
-
+### 2. Kütüphanelerin Yüklenmesi
+```bash
+git clone [https://github.com/kullaniciadi/vlm-autonomous-decision.git](https://github.com/kullaniciadi/vlm-autonomous-decision.git)
+cd vlm-autonomous-decision
 pip install -r requirements.txt
-
-
-Simülasyonu başlatın:
-
-python main.py
-
-
-🧪 Deneysel Senaryolar (Demo)
-
-Bu repo, raporda belirtilen teorik riskleri analiz etmek için aşağıdaki senaryoları simüle eder:
-
-Senaryo
-
-VLM Tespiti (Sistem 2)
-
-Güvenlik Müdahalesi (Sistem 1)
-
-Sonuç
-
-Okul Bölgesi
-
-"Çocuk çıkabilir, riskli bölge."
-
-Hız Sınırı Kontrolü (Max 30km/s)
-
-✅ Güvenli Yavaşlama
-
-Agresif Sürücü
-
-"Arkada taciz eden araç var, yol ver."
-
-Şerit Müsaitliği Kontrolü
-
-✅ Şerit Değiştirme
-
-Hatalı Karar (Test)
-
-"Yol boş, hızlan." (Halüsinasyon)
-
-Ön Engel Mesafe < 10m
-
-🛑 ACİL FREN (Müdahale)
-
-📚 Literatür ve Referanslar
-
-Bu çalışma, aşağıdaki temel literatür üzerine inşa edilmiştir (Tam liste proje raporundadır):
-
-GAIA-1: Otonom sürüş için üretken dünya modelleri.
-
-DriveGPT: Sürüş davranışlarının tokenizasyonu ve tahmini.
-
-DiLu Framework: Kapalı döngü öğrenme ve bellek yönetimi.
-
-DriveAgent-R1: Aktif algı ve hibrit düşünme.
-
-🔗 Katkı ve İletişim
-
-Bu proje, [Ders Adı/Proje Adı] kapsamında geliştirilmiştir.
-
-Geliştirici: [Adın Soyadın]
-
-İletişim: [E-posta Adresin]
-
-Not: Bu proje bir "Proof of Concept" (Kavram Kanıtı) çalışmasıdır ve gerçek araçlarda doğrudan kullanım için tasarlanmamıştır.
+```
+### 3. Modelin İndirilmesi (Ollama)
+Bu proje görsel yetenekleri için LLaVA modelini kullanır:
+```bash
+ollama pull llava
+```
